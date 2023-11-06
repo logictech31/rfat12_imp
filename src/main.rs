@@ -1,5 +1,6 @@
-use std::mem::size_of;
-// The total size of fat bootloader must be 512 bytes
+use std::fs::File;
+use std::io::{Read, Error};
+
 struct Fat12Bootloader {
     // Ignore the first 11 bytes
     _ignore1: [i8; 11],
@@ -22,8 +23,26 @@ struct Fat12Bootloader {
     file_sys_type: [u8; 8],
     _ignore5: [i8; 450],
 }
-fn main() {
-    const PATH_TO_FAT: &str = "/home/dijkstra/Documents/fat12.img";
 
-    println!("The size of FAT12 Bootloader is {}", size_of::<Fat12Bootloader>())
+fn main() {
+    let filename = "/home/dijkstra/Documents/fat12.img";
+
+    let mut file = File::open(filename).expect("Failed to open file");
+
+    let mut buffer = [0u8; 512];
+    file.read_exact(&mut buffer).expect("Failed to read bootloader data");
+
+    let bootloader_instance = unsafe { &*(buffer.as_ptr() as *const Fat12Bootloader) };
+
+    println!("Bootloader data:");
+    println!("Bytes per sector: {}", bootloader_instance.bytes_per_sector);
+    println!("Sectors per cluster: {}", bootloader_instance.sector_per_clustor);
+    println!("Number of reserved sectors: {}", bootloader_instance.num_reserved_sectors);
+    println!("Number of FATs: {}", bootloader_instance.num_fats);
+    println!("Maximum number of root directory entries: {}", bootloader_instance.max_num_root_entries);
+    println!("Total sector count: {}", bootloader_instance.total_sector_count);
+    println!("Bootloader signature: {}", bootloader_instance.boot_signature);
+    println!("Volume ID: {}", bootloader_instance.volume_id);
+    println!("Volume label: {}", String::from_utf8_lossy(&bootloader_instance.volume_label));
+    println!("File system type: {}", String::from_utf8_lossy(&bootloader_instance.file_sys_type));
 }
