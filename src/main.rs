@@ -34,7 +34,7 @@ fn main() {
     file.read_exact(&mut buffer).expect("Failed to read bootloader data");
 
     let bootloader_instance: &Fat12Bootloader = unsafe { &*(buffer.as_ptr() as *const Fat12Bootloader) };
-    println!("Bootloader has a size of {} bytes", mem::size_of<Fat12Bootloader>());
+    println!("Bootloader has a size of {} bytes", mem::size_of::<Fat12Bootloader>());
     println!("Bootloader data:");
     println!("Bytes per sector: {}", bootloader_instance.bytes_per_sector);
     println!("Sectors per cluster: {}", bootloader_instance.sector_per_clustor);
